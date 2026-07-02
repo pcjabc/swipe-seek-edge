@@ -8,6 +8,21 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path $PSScriptRoot -Parent
 Set-Location $Root
 
+# Use local proxy when direct GitHub access fails (e.g. Clash on 7897)
+if (-not $env:HTTPS_PROXY) {
+  $proxy = "http://127.0.0.1:7897"
+  try {
+    $tcp = New-Object System.Net.Sockets.TcpClient
+    $tcp.Connect("127.0.0.1", 7897)
+    $tcp.Close()
+    $env:HTTP_PROXY = $proxy
+    $env:HTTPS_PROXY = $proxy
+    $env:ALL_PROXY = $proxy
+  } catch {
+    # no local proxy listener
+  }
+}
+
 $gh = Get-Command gh -ErrorAction SilentlyContinue
 if (-not $gh) {
   throw "Install GitHub CLI first: winget install GitHub.cli"
