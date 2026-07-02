@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>进度条直接划 - 本地测试页</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 16px;
+        background: #111;
+        color: #eee;
+      }
+      video {
+        width: 100%;
+        max-width: 720px;
+        background: #000;
+        border-radius: 8px;
+      }
+      p {
+        line-height: 1.6;
+        color: #bbb;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>扩展测试页</h1>
+    <p>在下方视频<strong>画面中间</strong>横向滑动（不要滑底部控件条）。</p>
+    <video controls playsinline>
+      <source
+        src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+        type="video/webm"
+      />
+      <source
+        src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+        type="video/mp4"
+      />
+    </video>
+  </body>
+</html>

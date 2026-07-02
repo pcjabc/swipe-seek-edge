@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>进度条直接划 - 设置</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <h1>进度条直接划</h1>
+        <p class="subtitle">在视频画面上横向滑动即可拖动进度，边拖边预览画面。</p>
+      </header>
+
+      <form id="settings-form" class="card">
+        <label class="row row-switch">
+          <span>
+            <strong>启用扩展</strong>
+            <small>关闭后所有页面不再响应滑动手势</small>
+          </span>
+          <input id="enabled" type="checkbox" />
+        </label>
+
+        <label class="row">
+          <span>
+            <strong>滑动灵敏度</strong>
+            <small>数值越大，同样滑动距离跳转越多</small>
+          </span>
+          <output id="sensitivity-value">35%</output>
+          <input
+            id="sensitivity"
+            type="range"
+            min="10"
+            max="100"
+            step="5"
+            value="35"
+          />
+        </label>
+
+        <label class="row">
+          <span>
+            <strong>触发距离</strong>
+            <small>横向移动超过该像素后开始拖进度（越小越快）</small>
+          </span>
+          <output id="activationThreshold-value">10 px</output>
+          <input
+            id="activationThreshold"
+            type="range"
+            min="6"
+            max="30"
+            step="1"
+            value="10"
+          />
+        </label>
+
+        <label class="row">
+          <span>
+            <strong>底部控件保留区</strong>
+            <small>视频底部留给原生进度条/按钮的区域</small>
+          </span>
+          <output id="controlBarHeight-value">15%</output>
+          <input
+            id="controlBarHeight"
+            type="range"
+            min="5"
+            max="30"
+            step="1"
+            value="15"
+          />
+        </label>
+
+        <label class="row row-switch">
+          <span>
+            <strong>拖动时暂停</strong>
+            <small>暂停后预览帧更清晰，松手自动继续播放</small>
+          </span>
+          <input id="pauseWhileScrubbing" type="checkbox" checked />
+        </label>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">保存设置</button>
+          <button type="button" id="reset-btn" class="btn">恢复默认</button>
+        </div>
+
+        <p id="status" class="status" aria-live="polite"></p>
+      </form>
+
+      <section class="card tips">
+        <h2>使用说明</h2>
+        <ul>
+          <li>在<strong>视频画面中间区域</strong>横向滑动（左右拖动）即可 seek。</li>
+          <li>底部约 15% 区域留给原生控件，避免误触播放/全屏按钮。</li>
+          <li>适用于页面内原生 <code>&lt;video&gt;</code> 标签；YouTube 等自定义播放器需后续适配。</li>
+          <li>直播或 DRM 保护视频可能无法拖动进度。</li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="../shared/constants.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

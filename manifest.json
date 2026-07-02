@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "进度条直接划",
+  "version": "1.0.0",
+  "description": "在 Android Edge 上通过横向滑动视频画面拖动进度，边拖边预览画面，无需精确点击小进度条。",
+  "default_locale": "zh_CN",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png"
+    },
+    "default_title": "进度条直接划"
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "permissions": ["storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "src/shared/constants.js",
+        "src/content/overlay.js",
+        "src/content/gesture-controller.js",
+        "src/content/video-detector.js",
+        "src/content/main.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>进度条直接划</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="popup__header">
+        <h1>进度条直接划</h1>
+        <p>横向滑视频画面 → 拖进度</p>
+      </header>
+
+      <label class="toggle">
+        <span>启用</span>
+        <input id="enabled" type="checkbox" />
+      </label>
+
+      <div class="meta">
+        <span id="page-state">检测页面视频中…</span>
+      </div>
+
+      <nav class="links">
+        <a id="open-options" href="#">打开设置</a>
+      </nav>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
