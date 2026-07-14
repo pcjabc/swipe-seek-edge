@@ -6,27 +6,47 @@ const enabledInput = document.getElementById("enabled");
 const pageStateEl = document.getElementById("page-state");
 const openOptionsLink = document.getElementById("open-options");
 
+const DEFAULT_SETTINGS = {
+  enabled: true,
+  sensitivity: 0.12,
+  activationThreshold: 12,
+  controlBarHeight: 0.15,
+  scrubThrottleMs: 48,
+  minVideoSize: 100,
+  pauseWhileScrubbing: true
+};
+
+function persist(settings) {
+  const payload = { [STORAGE_KEY]: settings };
+  chrome.storage.local.set(payload);
+  chrome.storage.sync.set(payload);
+}
+
 function loadEnabledState() {
-  chrome.storage.sync.get(STORAGE_KEY, function onLoad(result) {
-    const settings = result[STORAGE_KEY] || { enabled: true };
-    enabledInput.checked = settings.enabled !== false;
+  chrome.storage.local.get(STORAGE_KEY, function onLocal(localResult) {
+    const local = localResult[STORAGE_KEY];
+    if (local) {
+      enabledInput.checked = local.enabled !== false;
+      return;
+    }
+    chrome.storage.sync.get(STORAGE_KEY, function onSync(result) {
+      const settings = result[STORAGE_KEY] || { enabled: true };
+      enabledInput.checked = settings.enabled !== false;
+    });
   });
 }
 
 function saveEnabledState(enabled) {
-  chrome.storage.sync.get(STORAGE_KEY, function onLoad(result) {
-    const settings = {
-      enabled: true,
-      sensitivity: 0.35,
-      activationThreshold: 10,
-      controlBarHeight: 0.15,
-      scrubThrottleMs: 48,
-      minVideoSize: 100,
-      pauseWhileScrubbing: true,
-      ...(result[STORAGE_KEY] || {})
-    };
-    settings.enabled = enabled;
-    chrome.storage.sync.set({ [STORAGE_KEY]: settings });
+  chrome.storage.local.get(STORAGE_KEY, function onLocal(localResult) {
+    chrome.storage.sync.get(STORAGE_KEY, function onSync(syncResult) {
+      const settings = {
+        ...DEFAULT_SETTINGS,
+        ...(syncResult[STORAGE_KEY] || {}),
+        ...(localResult[STORAGE_KEY] || {}),
+        enabled: enabled
+      };
+      persist(settings);
+    });
   });
 }
 
@@ -56,9 +76,11 @@ function inspectActiveTab() {
         }, 0);
 
         if (total > 0) {
-          pageStateEl.textContent = "检测到 " + total + " 个 video，可尝试滑动";
+          pageStateEl.textContent =
+            "检测到 " + total + " 个 video；连点视频三次可调灵敏度";
         } else {
-          pageStateEl.textContent = "未检测到 video 标签（自定义播放器站点可能不支持）";
+          pageStateEl.textContent =
+            "未检测到 video 标签（自定义播放器站点可能不支持）";
         }
       }
     );

@@ -4,9 +4,10 @@
   const SwipeSeek = global.SwipeSeek;
 
   class VideoDetector {
-    constructor(settings, overlay) {
+    constructor(settings, overlay, options) {
       this.settings = settings;
       this.overlay = overlay;
+      this.options = options || {};
       /** @type {Map<HTMLVideoElement, SwipeSeek.GestureController>} */
       this.controllers = new Map();
       this.observer = null;
@@ -87,7 +88,11 @@
         const controller = new SwipeSeek.GestureController(
           video,
           this.settings,
-          this.overlay
+          this.overlay,
+          {
+            onTripleTap: this.options.onTripleTap,
+            onFirstScrub: this.options.onFirstScrub
+          }
         );
         controller.attach();
         this.controllers.set(video, controller);

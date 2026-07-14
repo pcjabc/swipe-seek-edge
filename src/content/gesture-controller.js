@@ -9,10 +9,12 @@
      * @param {import('../shared/constants').SwipeSeekSettings} settings
      * @param {SwipeSeek.ScrubOverlay} overlay
      */
-    constructor(video, settings, overlay) {
+    constructor(video, settings, overlay, options) {
       this.video = video;
       this.settings = settings;
       this.overlay = overlay;
+      this.onTripleTap = options && options.onTripleTap;
+      this.onFirstScrub = options && options.onFirstScrub;
 
       this.active = false;
       this.scrubbing = false;
@@ -24,6 +26,8 @@
       this.previewTime = 0;
       this.wasPlaying = false;
       this.lastSeekAt = 0;
+      this.touchStartedAt = 0;
+      this.tapTimes = [];
 
       this.onTouchStart = this.onTouchStart.bind(this);
       this.onTouchMove = this.onTouchMove.bind(this);
@@ -79,6 +83,7 @@
       this.previewTime = this.anchorTime;
       this.wasPlaying = !this.video.paused && !this.video.ended;
       this.lastSeekAt = 0;
+      this.touchStartedAt = performance.now();
     }
 
     onTouchMove(event) {
@@ -134,16 +139,45 @@
 
       if (this.scrubbing) {
         this.commitSeek(this.previewTime);
+      } else {
+        this.registerPossibleTap(touch);
       }
 
       this.resetState();
     }
 
+    registerPossibleTap(touch) {
+      const elapsed = performance.now() - this.touchStartedAt;
+      const dx = touch.clientX - this.startX;
+      const dy = touch.clientY - this.startY;
+      if (elapsed > 280 || Math.hypot(dx, dy) > 14) {
+        this.tapTimes = [];
+        return;
+      }
+
+      const now = performance.now();
+      this.tapTimes = this.tapTimes.filter(function keepRecent(ts) {
+        return now - ts < 700;
+      });
+      this.tapTimes.push(now);
+
+      if (this.tapTimes.length >= 3 && typeof this.onTripleTap === "function") {
+        this.tapTimes = [];
+        this.onTripleTap();
+      }
+    }
+
     enterScrubbing() {
       this.scrubbing = true;
+      this.tapTimes = [];
 
       if (this.settings.pauseWhileScrubbing && this.wasPlaying) {
         this.video.pause();
+      }
+
+      if (typeof this.onFirstScrub === "function") {
+        this.onFirstScrub();
+        this.onFirstScrub = null;
       }
     }
 

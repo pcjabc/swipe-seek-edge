@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "进度条直接划",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "在 Android Edge 上通过横向滑动视频画面拖动进度，边拖边预览画面，无需精确点击小进度条。",
   "default_locale": "zh_CN",
   "icons": {
@@ -32,6 +32,7 @@
       "js": [
         "src/shared/constants.js",
         "src/content/overlay.js",
+        "src/content/settings-panel.js",
         "src/content/gesture-controller.js",
         "src/content/video-detector.js",
         "src/content/main.js"

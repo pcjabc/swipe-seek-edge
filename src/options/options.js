@@ -66,21 +66,18 @@ Object.values(fields).forEach(function bindLiveOutput(field) {
 form.addEventListener("submit", function onSubmit(event) {
   event.preventDefault();
   const settings = formToSettings();
-  chrome.storage.sync.set({ [STORAGE_KEY]: settings }, function onSaved() {
+  SwipeSeek.saveSettings(settings, function onSaved() {
     showStatus("已保存");
   });
 });
 
 resetBtn.addEventListener("click", function onReset() {
   settingsToForm(DEFAULT_SETTINGS);
-  chrome.storage.sync.set({ [STORAGE_KEY]: DEFAULT_SETTINGS }, function onResetSaved() {
+  SwipeSeek.saveSettings(DEFAULT_SETTINGS, function onResetSaved() {
     showStatus("已恢复默认");
   });
 });
 
-chrome.storage.sync.get(STORAGE_KEY, function onLoad(result) {
-  settingsToForm({
-    ...DEFAULT_SETTINGS,
-    ...(result[STORAGE_KEY] || {})
-  });
+SwipeSeek.loadSettings(function onLoad(settings) {
+  settingsToForm(settings);
 });

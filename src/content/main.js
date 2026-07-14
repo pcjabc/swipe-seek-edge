@@ -3,36 +3,22 @@
 
   const SwipeSeek = global.SwipeSeek;
   const STORAGE_KEY = SwipeSeek.STORAGE_KEY;
-  const DEFAULT_SETTINGS = SwipeSeek.DEFAULT_SETTINGS;
 
   /** @type {SwipeSeek.VideoDetector | null} */
   let detector = null;
   /** @type {SwipeSeek.ScrubOverlay | null} */
   let overlay = null;
-  /** @type {typeof DEFAULT_SETTINGS} */
-  let currentSettings = { ...DEFAULT_SETTINGS };
-
-  function mergeSettings(stored) {
-    return {
-      ...DEFAULT_SETTINGS,
-      ...(stored || {})
-    };
-  }
-
-  function loadSettings(callback) {
-    if (!global.chrome || !chrome.storage || !chrome.storage.sync) {
-      callback(currentSettings);
-      return;
-    }
-
-    chrome.storage.sync.get(STORAGE_KEY, function onLoaded(result) {
-      currentSettings = mergeSettings(result[STORAGE_KEY]);
-      callback(currentSettings);
-    });
-  }
+  /** @type {SwipeSeek.SettingsPanel | null} */
+  let settingsPanel = null;
+  let currentSettings = { ...SwipeSeek.DEFAULT_SETTINGS };
+  let firstScrubHintPending = true;
 
   function applySettings(settings) {
-    currentSettings = mergeSettings(settings);
+    currentSettings = SwipeSeek.mergeSettings(settings);
+
+    if (settingsPanel) {
+      settingsPanel.updateSettings(currentSettings);
+    }
 
     if (!currentSettings.enabled) {
       if (detector) {
@@ -49,8 +35,31 @@
       overlay = new SwipeSeek.ScrubOverlay();
     }
 
+    if (!settingsPanel) {
+      settingsPanel = new SwipeSeek.SettingsPanel(function onPanelChange(next) {
+        applySettings(next);
+      });
+      settingsPanel.updateSettings(currentSettings);
+    }
+
     if (!detector) {
-      detector = new SwipeSeek.VideoDetector(currentSettings, overlay);
+      detector = new SwipeSeek.VideoDetector(currentSettings, overlay, {
+        onTripleTap: function openPanel() {
+          if (settingsPanel) {
+            settingsPanel.open();
+          }
+        },
+        onFirstScrub: function maybeHint() {
+          if (!firstScrubHintPending || !settingsPanel) {
+            return;
+          }
+          firstScrubHintPending = false;
+          // 旧默认 0.35 的用户更可能觉得太快
+          if (currentSettings.sensitivity >= 0.25) {
+            settingsPanel.maybeShowHint();
+          }
+        }
+      });
       detector.start();
       return;
     }
@@ -59,13 +68,13 @@
   }
 
   function bootstrap() {
-    loadSettings(function onReady(settings) {
+    SwipeSeek.loadSettings(function onReady(settings) {
       applySettings(settings);
     });
 
     if (global.chrome && chrome.storage && chrome.storage.onChanged) {
       chrome.storage.onChanged.addListener(function onStorageChanged(changes, area) {
-        if (area !== "sync" || !changes[STORAGE_KEY]) {
+        if ((area !== "local" && area !== "sync") || !changes[STORAGE_KEY]) {
           return;
         }
         applySettings(changes[STORAGE_KEY].newValue);
