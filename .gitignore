@@ -1,3 +1,4 @@
+.pack-staging/
 dist/*.pem
 dist/*.crx
 dist/store-package.zip
