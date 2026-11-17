@@ -11,6 +11,8 @@
      */
     constructor(video, settings, overlay, options) {
       this.video = video;
+      this.eventTarget = (options && options.eventTarget) || video;
+      this.captureEvents = this.eventTarget !== video;
       this.settings = settings;
       this.overlay = overlay;
       this.onTripleTap = options && options.onTripleTap;
@@ -36,24 +38,47 @@
     }
 
     attach() {
-      this.video.addEventListener("touchstart", this.onTouchStart, {
+      this.eventTarget.addEventListener("touchstart", this.onTouchStart, {
+        capture: this.captureEvents,
         passive: true
       });
-      this.video.addEventListener("touchmove", this.onTouchMove, {
+      this.eventTarget.addEventListener("touchmove", this.onTouchMove, {
+        capture: this.captureEvents,
         passive: false
       });
-      this.video.addEventListener("touchend", this.onTouchEnd, { passive: true });
-      this.video.addEventListener("touchcancel", this.onTouchCancel, {
+      this.eventTarget.addEventListener("touchend", this.onTouchEnd, {
+        capture: this.captureEvents,
+        passive: true
+      });
+      this.eventTarget.addEventListener("touchcancel", this.onTouchCancel, {
+        capture: this.captureEvents,
         passive: true
       });
     }
 
     detach() {
       this.resetState();
-      this.video.removeEventListener("touchstart", this.onTouchStart);
-      this.video.removeEventListener("touchmove", this.onTouchMove);
-      this.video.removeEventListener("touchend", this.onTouchEnd);
-      this.video.removeEventListener("touchcancel", this.onTouchCancel);
+      this.removeEventListeners();
+    }
+
+    updateEventTarget(eventTarget) {
+      const nextTarget = eventTarget || this.video;
+      if (nextTarget === this.eventTarget) {
+        return;
+      }
+
+      this.resetState();
+      this.removeEventListeners();
+      this.eventTarget = nextTarget;
+      this.captureEvents = this.eventTarget !== this.video;
+      this.attach();
+    }
+
+    removeEventListeners() {
+      this.eventTarget.removeEventListener("touchstart", this.onTouchStart, this.captureEvents);
+      this.eventTarget.removeEventListener("touchmove", this.onTouchMove, this.captureEvents);
+      this.eventTarget.removeEventListener("touchend", this.onTouchEnd, this.captureEvents);
+      this.eventTarget.removeEventListener("touchcancel", this.onTouchCancel, this.captureEvents);
     }
 
     updateSettings(settings) {

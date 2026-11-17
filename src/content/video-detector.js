@@ -79,6 +79,7 @@
         }
         seen.add(video);
         if (this.controllers.has(video)) {
+          this.controllers.get(video).updateEventTarget(resolveGestureTarget(video));
           return;
         }
         if (!this.isCandidateVideo(video)) {
@@ -90,6 +91,7 @@
           this.settings,
           this.overlay,
           {
+            eventTarget: resolveGestureTarget(video),
             onTripleTap: this.options.onTripleTap,
             onFirstScrub: this.options.onFirstScrub
           }
@@ -107,19 +109,29 @@
     }
 
     isCandidateVideo(video) {
-      const rect = video.getBoundingClientRect();
-      if (rect.width < this.settings.minVideoSize || rect.height < this.settings.minVideoSize) {
-        return false;
-      }
-
-      const style = window.getComputedStyle(video);
-      if (style.display === "none" || style.visibility === "hidden") {
-        return false;
-      }
-
-      return true;
+      // 延迟初始化的播放器（Jable/Plyr 等）在首次扫描时可能仍是 0 尺寸或隐藏。
+      // 先绑定，真正开始手势时再由 GestureController 校验尺寸和可拖动状态。
+      return video.isConnected;
     }
   }
 
+  function isJableHost(hostname) {
+    return /(^|\.)jable\.tv$/i.test(hostname || "");
+  }
+
+  function resolveGestureTarget(video) {
+    if (!isJableHost(global.location && global.location.hostname)) {
+      return video;
+    }
+
+    // Jable 使用 Plyr，广告层、海报和播放按钮会盖在 video 上方。
+    // 在最近的播放器包装层捕获触摸，进度仍写入真实 video 元素。
+    return (
+      video.closest(".plyr__video-wrapper, #player-container, #player_3, .plyr") || video
+    );
+  }
+
   SwipeSeek.VideoDetector = VideoDetector;
+  SwipeSeek.isJableHost = isJableHost;
+  SwipeSeek.resolveGestureTarget = resolveGestureTarget;
 })(typeof globalThis !== "undefined" ? globalThis : window);
