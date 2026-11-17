@@ -6,21 +6,15 @@ Android Edge 扩展：在视频**画面中间**横向滑动即可拖动进度，
 
 需要 **Microsoft Edge Canary**（Google Play 安装）。
 
-1. **下载扩展文件**  
-   在手机上打开 [最新版本下载页](https://github.com/pcjabc/swipe-seek-edge/releases/latest)，下载附件 **`swipe-seek.crx`**。
+1. **下载扩展文件**：在手机上打开 [最新版本下载页](https://github.com/pcjabc/swipe-seek-edge/releases/latest)，下载附件 **`swipe-seek.crx`**。
 
-2. **开启扩展实验功能**（部分版本需要）  
-   地址栏输入 `edge://flags` → 搜索 `Android Extension` → 设为 **Enabled** → 重启 Edge Canary。
+2. **开启扩展实验功能**（部分版本需要）：地址栏输入 `edge://flags` → 搜索 `Android Extension` → 设为 **Enabled** → 重启 Edge Canary。
 
-3. **打开开发者选项**  
-   **设置 → 关于 Microsoft Edge → 连续点击版本号 5～7 次** → 返回设置，底部出现 **开发者选项**
+3. **打开开发者选项**：**设置 → 关于 Microsoft Edge → 连续点击版本号 5～7 次** → 返回设置，底部出现 **开发者选项**。
 
-4. **安装扩展**  
-   - **设置 → 开发者选项 → Extension install by crx** → 选择该文件  
-   - **扩展** 菜单中确认「进度条直接划」已启用  
+4. **安装扩展**：进入 **设置 → 开发者选项 → Extension install by crx**，选择下载的 CRX；然后在 **扩展** 菜单确认「进度条直接划」已启用。
 
-5. **测试 Jable.tv**  
-   打开一个视频并开始播放，在画面中上部左右滑动；底部约 15% 区域保留给播放器按钮，不触发拖动。
+5. **测试 Jable.tv**：打开一个视频并开始播放，在画面中上部左右滑动；底部约 15% 区域保留给播放器按钮，不触发拖动。
 
 如果已经装过旧版，请先卸载旧版，再安装新下载的 CRX。
 
